@@ -54,7 +54,7 @@ Their requirements are as follows:
 * You can also assume that everyone in your hello world has a unique name, there is only ever one Bob, one Dave, one Mary, etc.
 * You can have a UI to show the state of the resource, but you don’t need to worry about UI forms for adding/updating/removing people, just interact using curl or postman or your http tool of choice to send http requests to modify the state of the resource.
 
-Oh, and of course you are still a big believer of automated tests (this is sounding less and less like the 90's) so you need to have appropriate tests for all important logic!
+* Oh, and of course you are still a big believer of automated tests (this is sounding less and less like the 90's) so you need to have appropriate tests for all important logic!
 <br/>
 ---
 ## Installation
@@ -85,7 +85,15 @@ $ dotnet run
 Staying in the solution folder, enter `dotnet test` in your CLI to run the unit tests in the solution
 
 ---
+## The design
+This application is a basic web API which returns a formatted message and collects user names in a local list.  It has two endpoints, one being the root, and the other being users.
 
+The application itself is loosely based on domain-driven design as well as the Create, Read, Update and Delete (CRUD) Paradigm, which evolved as I was learning my way around http and APIs.
+
+## How it works
+An HTTP request is made and a custom request object is instantiated. Based on the URI endpoint, the Router class routes the request and instantiates a new instance of the required controller - because both controllers are implementing IController Interface, the appropriate methods are then called on the required controller instance and based on the request type.
+
+![sequence-diagram](screenshots/sequence-diagram.jpg)
 ## Usage
 ### Accessing the deployed application
 https://martyna-web-app.svc.platform.myobdev.com/
@@ -135,6 +143,23 @@ no body found
 ```
 
 ---
+
+## Deployment and Infrastructure
+This application has been deployed on a framework built on top of Kubernetes and is running on an automated CI/CD pipeline.  The below diagram illustrates the workflow from commit, to deployment.
+![pipeline](screenshots/pipeline-diagram.png)
+
+### Pipeline
+#### Step 1
+This step of the pipeline builds the test image and runs the tests against the source code. if the tests fail, the pipeline stops running.
+
+#### Step 2
+The Build and publish script builds the docker image before calling a sh file which runs a series of curl request tests against the running container, which, when successful, pushes the image to the Elastic Repository Registry, or ECR on AWS. It does this by logging into the ECR, thanks to the IAM permissions set on the repository.
+
+#### Step 3
+Step 3 deploys the application via the deploy script, passing the image tag (the truncated Buildkite commit number) into the deployment yaml, which ensures that new pods are spun up at each successful commit.  The deployment.yml declares all requirements for the application to run, incl
+
+- number of replicas (pods)
+- compute requirements
 
 ## Dependencies
 [XUnit](https://xunit.net/) - Testing framework <br/>
