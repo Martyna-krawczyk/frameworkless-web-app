@@ -1,0 +1,83 @@
+---
+kind: "Template"
+apiVersion: "v1"
+metadata:
+  name: "martyna-web-app"
+  annotations:
+    description: "Deployment for Martyna Frameworkless Web App"
+objects:
+  
+  - kind: Deployment
+    apiVersion: apps/v1
+    metadata:
+      name: "martyna-web-app-deployment"
+    spec:
+      replicas: 1
+      selector:
+        matchLabels:
+          app: "martyna-web-app"
+      template:
+        metadata:
+          labels:
+            app: "martyna-web-app"
+        spec:
+          containers:
+            - image: "741922737521.dkr.ecr.ap-southeast-2.amazonaws.com/martyna-web-app:$(imageTag)"
+              name: "martyna-web-app"
+              ports:
+                - containerPort: 8080
+              resources:
+                limits:
+                  memory: 0.2Gi
+                requests:
+                  memory: 35Mi
+              livenessProbe:
+                httpGet:
+                  path: /
+                  port: 8080
+                initialDelaySeconds: 3
+                periodSeconds: 3
+              readinessProbe:
+                httpGet:
+                  path: /
+                  port: 8080
+                initialDelaySeconds: 3
+                timeoutSeconds: 8
+                periodSeconds: 10
+    
+  - kind: Service
+    apiVersion: v1
+    metadata:
+      name: "martyna-web-app"
+    spec:
+      ports:
+        - port: 80
+          targetPort: 8080
+      selector:
+        app: "martyna-web-app"
+
+  - kind: Ingress
+    apiVersion: extensions/v1beta1
+    metadata:
+      annotations:
+        kubernetes.io/tls-acme: "true"
+      name: "martyna-web-app"
+    spec:
+      rules:
+        - host: "martyna-web-app.svc.platform.myobdev.com"
+          http:
+            paths:
+              - path: /
+                backend:
+                  serviceName: "martyna-web-app"
+                  servicePort: 80
+      tls:
+        - hosts:
+            - "martyna-web-app.svc.platform.myobdev.com"
+          secretName: "martyna-web-app-tls"
+
+parameters:
+  - name: "imageTag"
+    description: "Image tag"
+    required: true
+    parameterType: string

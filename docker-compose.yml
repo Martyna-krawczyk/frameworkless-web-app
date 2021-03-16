@@ -1,0 +1,37 @@
+---
+version: '3.4'
+
+services:
+  stage: &stage
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: base
+    image: martyna-web-app-tests:latest
+    working_dir: /app/FrameworklessWebAppTests
+ 
+  test:
+    <<: *stage
+    container_name: martyna-test-run
+    entrypoint: dotnet
+    command: test
+    volumes:
+      - ".:/app"
+
+  debug-test:
+    <<: *stage
+    container_name: martyna-debug-test
+    entrypoint: bash
+    volumes:
+    - ".:/app"
+    
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: runtime
+    image: martyna-web-app:latest
+    container_name: martyna-app-run
+    working_dir: /app
+    ports:
+      - "8080:8080"
