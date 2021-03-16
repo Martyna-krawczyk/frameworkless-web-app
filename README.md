@@ -1,9 +1,7 @@
-[![Build status](https://badge.buildkite.com/27a0adbea68d81417508a5adf10b480e674598a29090b2b68d.svg)](https://buildkite.com/myob/martyna-frameworkless-web-app)
-
 # Frameworkless Basic Web Application Kata
 ### This application has been created for the second Quorum Review, as part of MYOB's Future Makers Academy acceleration program.
 
-# Requirements
+## Requirements
 It's the late 1990s and the internet has just begun to flourish. You have a brilliant idea to build a Hello World web application however there are no MVC frameworks for you to use. Your mission is to implement a basic Hello World web application without using any frameworks. 
 
 When calling the web application from a browser it should return a greeting with your name and the current date/time of the server. For instance, if your name was Bob when hitting the web server (http://localhost:8080) the browser would display "Hello Bob - the time on the server is 10:48pm on 14 March 2018" 
@@ -12,35 +10,13 @@ _(Yes, we know we said you were in the 1990s... but we want you to use your curr
 
 Oh, and of course you are one of those new age eXtreme programmers so you need to have appropriate tests! To make your life easier we have got starting points for Java and C#  
 
-## To summarise 
+### To summarise 
 
 * Keep with standard libraries, don't use frameworks like Spring/Dropwizard or equivalent  
 * Try implement all the dispatching code manually.  
 * Include in your solution a test case for proving that the "greeting" portion of the system is functioning correctly.  
 
-If you are working in C#, a trivial web server that doesn't rely on
-ASP.NET Core follows. Note that it handles a single request at a time,
-synchronously. Converting it to be asynchronous, so as to be able to handle
-more than one request simultaneously, is a useful future exercise.
-
-~~~
-var server = new HttpListener();
-server.Prefixes.Add("http://localhost:8080/");
-server.Start();
-while (true)
-{
-    var context = server.GetContext();  // Gets the request
-    Console.WriteLine($"{context.Request.HttpMethod} {context.Request.Url}");
-    var buffer = System.Text.Encoding.UTF8.GetBytes("Hello");
-    context.Response.ContentLength64 = buffer.Length;
-    context.Response.OutputStream.Write(buffer, 0, buffer.Length);  // forces send of response
-}
-server.Stop();  // never reached...
-~~~
-
-----------------------------------------------------------------------
-
-# Enhancements
+### Enhancements
 
 Their requirements are as follows:
 
@@ -57,6 +33,7 @@ Their requirements are as follows:
 * Oh, and of course you are still a big believer of automated tests (this is sounding less and less like the 90's) so you need to have appropriate tests for all important logic!
 <br/>
 ---
+
 ## Installation
 
 ### System Requirements
@@ -85,7 +62,7 @@ $ dotnet run
 Staying in the solution folder, enter `dotnet test` in your CLI to run the unit tests in the solution
 
 ---
-## The design
+## The Design
 This application is a basic web API which returns a formatted message and collects user names in a local list.  It has two endpoints, one being the root, and the other being users.
 
 The application itself is loosely based on domain-driven design as well as the Create, Read, Update and Delete (CRUD) Paradigm, which evolved as I was learning my way around http and APIs.
@@ -94,6 +71,7 @@ The application itself is loosely based on domain-driven design as well as the C
 An HTTP request is made and a custom request object is instantiated. Based on the URI endpoint, the Router class routes the request and instantiates a new instance of the required controller - because both controllers are implementing IController Interface, the appropriate methods are then called on the required controller instance and based on the request type.
 
 ![sequence-diagram](screenshots/sequence-diagram.jpg)
+
 ## Usage
 ### Accessing the deployed application
 https://martyna-web-app.svc.platform.myobdev.com/
@@ -131,17 +109,6 @@ A successful PUT request will return a message that name has been updated.
 ```
 Bob has been updated to Terry
 ```
-
-### Error Codes
-If attempting to add a name that is already in the user list, a 403 (Forbidden) status code will be returned with the custom message below:
-```
-sorry that can't be done
-```
-If there is no body in the request, a 400  (Bad Request) status code will be returned with the custom message below:
-```
-no body found
-```
-
 ---
 
 ## Deployment and Infrastructure
