@@ -1,0 +1,8 @@
+bin/
+obj/
+.DS_Store
+.idea/
+.git/
+.buildkite/
+docker-compose.yml
+Dockerfile
